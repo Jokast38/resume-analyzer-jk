@@ -74,6 +74,13 @@ def _resolve_tesseract_cmd() -> Optional[str]:
 
     return None
 
+def _is_tesseract_available() -> bool:
+    try:
+        pytesseract.get_tesseract_version()
+        return True
+    except Exception:
+        return False
+
 def _resolve_poppler_path() -> Optional[str]:
     env_candidates = [
         os.environ.get("POPPLER_PATH"),
@@ -580,27 +587,29 @@ def extract_text_from_file(file: UploadFile) -> str:
             pytesseract.pytesseract.tesseract_cmd = resolved_tesseract_cmd
             print(f"[DEBUG] Using tesseract_cmd: {resolved_tesseract_cmd}")
 
-            try:
-                available_langs = pytesseract.get_languages(config="")
-            except Exception:
-                available_langs = []
-
-            if "fra" in available_langs:
-                lang = "fra"
-            elif "eng" in available_langs:
-                lang = "eng"
-            elif "osd" in available_langs:
-                lang = "osd"
-
-            print(f"[DEBUG] OCR language selected: {lang}; available={available_langs}")
-        else:
+        if not _is_tesseract_available():
             raise HTTPException(
                 status_code=500,
                 detail=(
-                    "Tesseract executable not found. Install Tesseract OCR and set TESSERACT_CMD in backend/.env "
-                    "(example: C:\\Program Files\\Tesseract-OCR\\tesseract.exe)."
+                    "Tesseract executable not found. Ensure Tesseract OCR is installed on the server and reachable in PATH, "
+                    "or set TESSERACT_CMD to the executable path. "
+                    "Examples: Windows=C:\\Program Files\\Tesseract-OCR\\tesseract.exe, Linux=/usr/bin/tesseract."
                 ),
             )
+
+        try:
+            available_langs = pytesseract.get_languages(config="")
+        except Exception:
+            available_langs = []
+
+        if "fra" in available_langs:
+            lang = "fra"
+        elif "eng" in available_langs:
+            lang = "eng"
+        elif "osd" in available_langs:
+            lang = "osd"
+
+        print(f"[DEBUG] OCR language selected: {lang}; available={available_langs}")
 
         if is_pdf:
             poppler_bin_path = _resolve_poppler_path()
