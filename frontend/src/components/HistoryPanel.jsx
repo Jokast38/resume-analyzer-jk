@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { History, Trash2, Eye, ChevronRight, Calendar, Loader2 } from "lucide-react";
 import { Button } from "../components/ui/button";
 import axios from "axios";
@@ -12,11 +12,7 @@ export const HistoryPanel = ({ onSelectAnalysis, language = "en" }) => {
   const [error, setError] = useState("");
   const t = getTranslator(language);
 
-  useEffect(() => {
-    fetchAnalyses();
-  }, []);
-
-  const fetchAnalyses = async () => {
+  const fetchAnalyses = useCallback(async () => {
     setIsLoading(true);
     try {
       const response = await axios.get(`${API}/analyses`);
@@ -27,7 +23,11 @@ export const HistoryPanel = ({ onSelectAnalysis, language = "en" }) => {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [t]);
+
+  useEffect(() => {
+    fetchAnalyses();
+  }, [fetchAnalyses]);
 
   const deleteAnalysis = async (id, e) => {
     e.stopPropagation();

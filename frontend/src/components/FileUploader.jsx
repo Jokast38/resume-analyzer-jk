@@ -26,7 +26,16 @@ export const FileUploader = ({ onTextExtracted, onAnalyze, language = "en" }) =>
     setIsDragging(false);
   }, []);
 
-  const processFile = async (selectedFile) => {
+  const fileToBase64 = useCallback((file) => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  }, []);
+
+  const processFile = useCallback(async (selectedFile) => {
     setFile(selectedFile);
     setError("");
     setExtractedText("");
@@ -105,16 +114,7 @@ export const FileUploader = ({ onTextExtracted, onAnalyze, language = "en" }) =>
       setIsProcessing(false);
       setProgress(0);
     }
-  };
-
-  const fileToBase64 = (file) => {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = () => resolve(reader.result);
-      reader.onerror = reject;
-      reader.readAsDataURL(file);
-    });
-  };
+  }, [API, fileToBase64, onTextExtracted, t]);
 
   const handleDrop = useCallback((e) => {
     e.preventDefault();
@@ -124,7 +124,7 @@ export const FileUploader = ({ onTextExtracted, onAnalyze, language = "en" }) =>
     if (droppedFile) {
       processFile(droppedFile);
     }
-  }, []);
+  }, [processFile]);
 
   const handleFileSelect = (e) => {
     const selectedFile = e.target.files[0];

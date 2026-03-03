@@ -62,6 +62,27 @@ def _resolve_tesseract_cmd() -> Optional[str]:
 
     return None
 
+def _resolve_poppler_path() -> Optional[str]:
+    env_candidates = [
+        os.environ.get("POPPLER_PATH"),
+    ]
+
+    windows_candidates = [
+        r"C:\Program Files\poppler\Library\bin",
+        r"C:\Program Files\poppler-25.12.0\Library\bin",
+    ]
+
+    for candidate in env_candidates + windows_candidates:
+        if candidate and Path(candidate).exists():
+            return candidate
+
+    return None
+
+def _parse_cors_origins() -> List[str]:
+    cors_raw = os.environ.get("CORS_ORIGINS", "*")
+    origins = [origin.strip() for origin in cors_raw.split(",") if origin.strip()]
+    return origins or ["*"]
+
 # ============ Models ============
 
 class SkillAnalysis(BaseModel):
@@ -570,10 +591,13 @@ def extract_text_from_file(file: UploadFile) -> str:
             )
 
         if is_pdf:
-            poppler_bin_path = r"C:\Program Files\poppler-25.12.0\Library\bin"
+            poppler_bin_path = _resolve_poppler_path()
             print(f"[DEBUG] Using poppler_path for pdf2image: {poppler_bin_path}")
             try:
-                images = convert_from_bytes(content, dpi=300, poppler_path=poppler_bin_path)
+                convert_kwargs = {"dpi": 300}
+                if poppler_bin_path:
+                    convert_kwargs["poppler_path"] = poppler_bin_path
+                images = convert_from_bytes(content, **convert_kwargs)
                 print(f"[DEBUG] PDF converted to {len(images)} image(s) using poppler.")
             except Exception as e:
                 print(f"[ERROR] PDF conversion failed: {e}")
@@ -884,10 +908,13 @@ async def delete_analysis(analysis_id: str):
 # Include the router in the main app
 app.include_router(api_router)
 
+cors_origins = _parse_cors_origins()
+allow_all_origins = cors_origins == ["*"]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_credentials=True,
-    allow_origins=os.environ.get('CORS_ORIGINS', '*').split(','),
+    allow_credentials=not allow_all_origins,
+    allow_origins=cors_origins,
     allow_methods=["*"],
     allow_headers=["*"],
 )

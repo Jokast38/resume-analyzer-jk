@@ -68,7 +68,7 @@ export const CameraScanner = ({ onTextExtracted, onAnalyze, language = "en" }) =
       setIsScanning(false);
       setProgress(0);
     }
-  }, [onTextExtracted]);
+  }, [onTextExtracted, t]);
 
   const toggleCamera = () => {
     setIsCameraOn(!isCameraOn);
