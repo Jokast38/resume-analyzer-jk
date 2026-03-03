@@ -1,0 +1,134 @@
+{
+  "project_name": "OCR_Resume_Scanner",
+  "design_philosophy": {
+    "theme_name": "Tactical Void",
+    "core_concept": "Minority Report meets Modern ATS. High-tech, scanning lines, data visibility, neon glows.",
+    "emotional_tone": "Precision, Insight, Future-forward",
+    "visual_style": "Dark Mode Only. Cyberpunk influences but clean enough for HR professionals."
+  },
+  "typography": {
+    "font_families": {
+      "headings": "Space Grotesk, sans-serif",
+      "body": "Outfit, sans-serif",
+      "mono": "JetBrains Mono, monospace"
+    },
+    "import_url": "https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Outfit:wght@300;400;500;600&family=Space+Grotesk:wght@300;400;500;600;700&display=swap",
+    "usage_rules": {
+      "headings": "Use Space Grotesk for all H1-H6. Tracking tight (-0.02em). Uppercase for H6 labels.",
+      "body": "Use Outfit for all paragraphs. High legibility.",
+      "code": "Use JetBrains Mono for extracted data, resume scores, and OCR raw text."
+    }
+  },
+  "colors": {
+    "palette": {
+      "background": "#030014",
+      "foreground": "#F8FAFC",
+      "card": "rgba(10, 10, 12, 0.6)",
+      "card_foreground": "#F8FAFC",
+      "primary": "#7C3AED",
+      "primary_foreground": "#FFFFFF",
+      "secondary": "#1E1B4B",
+      "secondary_foreground": "#A78BFA",
+      "accent": "#22D3EE",
+      "accent_foreground": "#000000",
+      "destructive": "#EF4444",
+      "muted": "#1E293B",
+      "muted_foreground": "#94A3B8",
+      "border": "rgba(124, 58, 237, 0.2)",
+      "input": "rgba(124, 58, 237, 0.2)",
+      "ring": "#7C3AED"
+    },
+    "tailwind_config_extension": {
+      "colors": {
+        "void": "#030014",
+        "cyber-purple": "#7C3AED",
+        "neon-cyan": "#22D3EE",
+        "success-green": "#10B981"
+      },
+      "backgroundImage": {
+        "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
+        "scanner-beam": "linear-gradient(to bottom, transparent, #7C3AED, transparent)"
+      }
+    }
+  },
+  "layout_strategy": {
+    "mobile_first": true,
+    "grid_system": "Bento Grid (Mode A for Landing, Mode B for Dashboard)",
+    "container_padding": "px-4 md:px-8 lg:px-12",
+    "spacing_scale": "Generous. Use gap-6 or gap-8 to let data breathe."
+  },
+  "components": {
+    "buttons": {
+      "primary": "rounded-full bg-primary hover:bg-primary/90 text-white font-medium shadow-[0_0_15px_rgba(124,58,237,0.5)] transition-all hover:scale-105",
+      "secondary": "rounded-full border border-primary/50 bg-transparent hover:bg-primary/10 text-primary-foreground transition-all",
+      "ghost": "hover:bg-primary/10 text-muted-foreground hover:text-primary"
+    },
+    "cards": {
+      "style": "Glassmorphism. bg-void/50 backdrop-blur-md border border-white/10 hover:border-primary/50 transition-colors duration-300",
+      "interaction": "Hover: distinct glow or border color shift"
+    },
+    "inputs": {
+      "style": "bg-white/5 border-white/10 focus:border-primary/50 focus:ring-1 focus:ring-primary/50 rounded-lg h-12"
+    },
+    "scanner_overlay": {
+      "description": "A viewfinder overlay for the camera component",
+      "style": "border-2 border-primary/50 rounded-lg relative overflow-hidden",
+      "animation": "A scanning line moving up and down continuously"
+    }
+  },
+  "visual_enhancers": {
+    "gradients": "Use purple-to-cyan gradients sparingly for emphasis (e.g., score gauges).",
+    "shadows": "Colored shadows! shadow-[0_10px_30px_-10px_rgba(124,58,237,0.5)]",
+    "borders": "1px solid rgba(255,255,255,0.08). Active elements get purple borders.",
+    "textures": "Subtle noise overlay on the background to reduce banding and add 'tactile' feel."
+  },
+  "motion_guidelines": {
+    "page_transitions": "Fade in + Slide up (y: 20 -> 0)",
+    "hover_effects": "Scale 1.02, Border Color Shift",
+    "loading_states": "Glitch text effect or scanning beam animation. NOT a simple spinner.",
+    "scanner_beam": "Linear interpolation, infinite loop, ease-in-out"
+  },
+  "assets": {
+    "image_urls": {
+      "hero_background": "https://images.unsplash.com/photo-1741795990583-d4115c018da2?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NTYxODh8MHwxfHNlYXJjaHw0fHxjeWJlcnB1bmslMjBwdXJwbGUlMjBkYXRhJTIwZ3JpZCUyMGJhY2tncm91bmR8ZW58MHx8fHwxNzcyNTE3MjIzfDA&ixlib=rb-4.1.0&q=85",
+      "abstract_grid": "https://images.unsplash.com/photo-1771011726573-60f32b69d63b?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NTYxODh8MHwxfHNlYXJjaHwzfHxjeWJlcnB1bmslMjBwdXJwbGUlMjBkYXRhJTIwZ3JpZCUyMGJhY2tncm91bmR8ZW58MHx8fHwxNzcyNTE3MjIzfDA&ixlib=rb-4.1.0&q=85",
+      "placeholder_resume": "https://images.unsplash.com/photo-1586281380349-632531db7ed4?auto=format&fit=crop&q=80&w=2000"
+    },
+    "icons": {
+      "library": "lucide-react",
+      "preferred_icons": ["ScanLine", "FileText", "Cpu", "Camera", "Upload", "CheckCircle2", "AlertTriangle", "BarChart3"]
+    }
+  },
+  "accessibility": {
+    "contrast_check": "Ensure purple text on black background is at least 4.5:1. Use lighter purples (Violet-300/400) for text, darker for bg.",
+    "interactive_elements": "Min height 44px for touch targets (mobile first).",
+    "reduced_motion": "Disable scanning beam animation if prefers-reduced-motion is true."
+  },
+  "instructions_to_main_agent": [
+    "1. INSTALL FONTS FIRST: Add the Google Fonts import to index.css immediately.",
+    "2. SETUP TAILWIND: Update tailwind.config.js with the 'void', 'cyber-purple', 'neon-cyan' colors.",
+    "3. CAMERA: When building the CameraScanner, ensure the video element has object-fit: cover and takes up the full container. Overlay controls on top with absolute positioning.",
+    "4. OCR LOADING: Implement a 'Deciphering' UI state where the text appears to be scanned line by line.",
+    "5. DASHBOARD: Use the Bento Grid layout for the analysis results. Score in a big square, skills in a tall rectangle.",
+    "6. USE SHADCN: Heavily customize Shadcn components (Card, Button, Dialog) to match the glassmorphism style. Remove default white backgrounds.",
+    "7. DATA-TESTID: Add data-testid to the upload button, camera toggle, and analysis result containers."
+  ],
+  "UNIVERSAL_GUIDELINES_FOR_MAIN_AGENT": [
+    "Dark colors look good when used independently without gradients. DO NOT use dark colors as gradients",
+    "Don't make generic centered layouts, simplistic gradients, and uniform styling.",
+    "Create depth through layered design elements with z-index hierarchy",
+    "Use glass-morphism effects with backdrop filters (12-24px blur)",
+    "You MUST NOT apply universal transition. Eg: transition: all. This results in breaking transforms. Always add transitions for specific interactive elements like button, input excluding transforms",
+    "You MUST NOT center align the app container, ie do not add .App { text-align: center; } in the css file. This disrupts the human natural reading flow of text",
+    "Always use modern button styles like pill-shaped, or sharp button with interaction animations & color relevant to the app style",
+    "NEVER: use AI assistant Emoji characters like 🤖🧠 etc for icons.",
+    "Every interaction needs micro-animations - hover states, transitions, entrance animations. Static = dead.",
+    "Use 2-3x more spacing than feels comfortable.",
+    "Subtle grain textures, noise overlays, custom cursors, selection states, and loading animations: separates good from extraordinary.",
+    "Main agent relies on these image URLs. Missing categories = main agent will use placeholder text which is FORBIDDEN",
+    "Prioritize using pre-existing components from src/components/ui when applicable",
+    "Components MUST use named exports",
+    "Pages MUST use default exports",
+    "Use sonner for toasts"
+  ]
+}
