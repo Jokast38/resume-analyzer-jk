@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { History, Trash2, Eye, ChevronRight, Calendar, Loader2 } from "lucide-react";
 import { Button } from "../components/ui/button";
 import axios from "axios";
@@ -10,7 +10,7 @@ export const HistoryPanel = ({ onSelectAnalysis, language = "en" }) => {
   const [analyses, setAnalyses] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
-  const t = getTranslator(language);
+  const t = useMemo(() => getTranslator(language), [language]);
 
   const fetchAnalyses = useCallback(async () => {
     setIsLoading(true);

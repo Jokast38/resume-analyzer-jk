@@ -15,6 +15,8 @@ import json
 import re
 import io
 import shutil
+import time
+import asyncio
 # OCR dependencies
 from PIL import Image
 import pytesseract
@@ -40,6 +42,16 @@ logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
 )
 logger = logging.getLogger(__name__)
+
+ANALYSES_CACHE_TTL_SECONDS = float(os.environ.get("ANALYSES_CACHE_TTL_SECONDS", "2"))
+_analyses_cache_payload: List[Dict[str, Any]] = []
+_analyses_cache_expires_at: float = 0.0
+_analyses_cache_lock = asyncio.Lock()
+
+def _invalidate_analyses_cache() -> None:
+    global _analyses_cache_payload, _analyses_cache_expires_at
+    _analyses_cache_payload = []
+    _analyses_cache_expires_at = 0.0
 
 def _resolve_tesseract_cmd() -> Optional[str]:
     env_candidates = [
@@ -697,6 +709,7 @@ async def analyze_resume_file(file: UploadFile = File(...), analysis_type: str =
         doc['created_at'] = doc['created_at'].isoformat()
         try:
             await db.analyses.insert_one(doc)
+            _invalidate_analyses_cache()
         except Exception as db_error:
             logger.warning(f"Failed to save analysis in MongoDB (continuing response): {db_error}")
         return result
@@ -797,6 +810,7 @@ async def analyze_resume_text(request: DocumentAnalysisRequest):
         doc['created_at'] = doc['created_at'].isoformat()
         try:
             await db.analyses.insert_one(doc)
+            _invalidate_analyses_cache()
         except Exception as db_error:
             logger.warning(f"Failed to save analysis in MongoDB (continuing response): {db_error}")
         
@@ -860,14 +874,26 @@ async def explain_document(request: DocumentExplanationRequest):
 async def get_analyses():
     """Get recent analyses"""
     try:
-        analyses = await db.analyses.find({}, {"_id": 0}).sort("created_at", -1).limit(20).to_list(20)
+        global _analyses_cache_payload, _analyses_cache_expires_at
+        now = time.monotonic()
+        if now < _analyses_cache_expires_at and _analyses_cache_payload:
+            return _analyses_cache_payload
+
+        async with _analyses_cache_lock:
+            now = time.monotonic()
+            if now < _analyses_cache_expires_at and _analyses_cache_payload:
+                return _analyses_cache_payload
+
+            analyses = await db.analyses.find({}, {"_id": 0}).sort("created_at", -1).limit(20).to_list(20)
         
-        for analysis in analyses:
-            _normalize_saved_analysis(analysis)
-            if isinstance(analysis.get('created_at'), str):
-                analysis['created_at'] = datetime.fromisoformat(analysis['created_at'])
-        
-        return analyses
+            for analysis in analyses:
+                _normalize_saved_analysis(analysis)
+                if isinstance(analysis.get('created_at'), str):
+                    analysis['created_at'] = datetime.fromisoformat(analysis['created_at'])
+
+            _analyses_cache_payload = analyses
+            _analyses_cache_expires_at = time.monotonic() + ANALYSES_CACHE_TTL_SECONDS
+            return analyses
     except Exception as e:
         logger.error(f"Error fetching analyses: {e}")
         raise HTTPException(status_code=500, detail=str(e))
@@ -898,6 +924,7 @@ async def delete_analysis(analysis_id: str):
         result = await db.analyses.delete_one({"id": analysis_id})
         if result.deleted_count == 0:
             raise HTTPException(status_code=404, detail="Analysis not found")
+        _invalidate_analyses_cache()
         return {"message": "Analysis deleted successfully"}
     except HTTPException:
         raise
